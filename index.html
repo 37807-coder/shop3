@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Shopping Master</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Sarabun:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #f8fafc;
+            --card-bg: #ffffff;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --accent-color: #6366f1;
+            --accent-hover: #4f46e5;
+            --border-color: #e2e8f0;
+            --item-bg: #f8fafc;
+            --shadow-sm: 0 4px 6px -1px rgba(0,0,0,0.05);
+            --shadow-lg: 0 20px 25px -5px rgba(0,0,0,0.1);
+        }
+
+        [data-theme="dark"] {
+            --bg-primary: #0f172a;
+            --card-bg: #1e293b;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --accent-color: #818cf8;
+            --accent-hover: #6366f1;
+            --border-color: #334155;
+            --item-bg: #0f172a;
+        }
+
+        * {
+            box-sizing: border-box;
+            font-family: 'Plus Jakarta Sans', 'Sarabun', sans-serif;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        body {
+            background-color: var(--bg-primary);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 24px;
+            margin: 0;
+        }
+
+        .app-card {
+            background: var(--card-bg);
+            width: 100%;
+            max-width: 520px;
+            border-radius: 24px;
+            padding: 32px;
+            box-shadow: var(--shadow-lg);
+            border: 1px solid var(--border-color);
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+
+        .header h1 {
+            font-size: 24px;
+            font-weight: 700;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .theme-toggle {
+            background: var(--item-bg);
+            border: 1px solid var(--border-color);
+            color: var(--text-main);
+            padding: 8px 12px;
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .progress-section {
+            background: var(--item-bg);
+            padding: 16px;
+            border-radius: 16px;
+            margin-bottom: 24px;
+        }
+
+        .progress-info {
+            display: flex;
+            justify-content: space-between;
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .progress-bar-bg {
+            background: var(--border-color);
+            height: 8px;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .progress-bar-fill {
+            background: var(--accent-color);
+            height: 100%;
+            width: 0%;
+            transition: width 0.4s ease;
+        }
+
+        .input-form {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+
+        .input-row-top {
+            display: flex;
+            gap: 8px;
+        }
+
+        .input-row-bottom {
+            display: flex;
+            gap: 8px;
+        }
+
+        input, select {
+            background: var(--item-bg);
+            border: 1px solid var(--border-color);
+            color: var(--text-main);
+            padding: 12px 16px;
+            border-radius: 12px;
+            font-size: 14px;
+            outline: none;
+        }
+
+        input:focus, select:focus {
+            border-color: var(--accent-color);
+        }
+
+        .input-name { flex: 2; }
+        .input-cat { flex: 1.5; }
+        .input-qty { width: 80px; }
+        .input-price { width: 100px; }
+
+        .btn-add {
+            background: var(--accent-color);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            flex: 1;
+        }
+
+        .btn-add:hover {
+            background: var(--accent-hover);
+        }
+
+        .filter-tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 20px;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 12px;
+        }
+
+        .tab-btn {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            font-weight: 600;
+            cursor: pointer;
+            padding: 6px 12px;
+            border-radius: 8px;
+        }
+
+        .tab-btn.active {
+            background: var(--item-bg);
+            color: var(--accent-color);
+        }
+
+        .item-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            max-height: 320px;
+            overflow-y: auto;
+        }
+
+        .item-card {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: var(--item-bg);
+            padding: 14px 16px;
+            border-radius: 14px;
+            margin-bottom: 10px;
+            border: 1px solid transparent;
+        }
+
+        .item-card:hover {
+            border-color: var(--border-color);
+        }
+
+        .item-card.completed {
+            opacity: 0.5;
+        }
+
+        .item-card.completed .item-title {
+            text-decoration: line-through;
+        }
+
+        .item-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .checkbox {
+            width: 20px;
+            height: 20px;
+            accent-color: var(--accent-color);
+            cursor: pointer;
+        }
+
+        .item-details {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .item-title {
+            font-weight: 600;
+            font-size: 15px;
+        }
+
+        .item-meta {
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-top: 2px;
+        }
+
+        .badge {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            padding: 2px 6px;
+            border-radius: 6px;
+            font-size: 11px;
+            margin-right: 6px;
+        }
+
+        .item-right {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .price-tag {
+            font-weight: 700;
+            font-size: 14px;
+        }
+
+        .btn-del {
+            background: none;
+            border: none;
+            color: #ef4444;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        .summary-footer {
+            margin-top: 24px;
+            padding-top: 16px;
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .total-price {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--accent-color);
+        }
+    </style>
+</head>
+<body>
+
+<div class="app-card">
+    <div class="header">
+        <h1>🛒 Smart Cart</h1>
+        <button class="theme-toggle" onclick="toggleTheme()" id="themeBtn">🌙 Dark</button>
+    </div>
+
+    <div class="progress-section">
+        <div class="progress-info">
+            <span>ความคืบหน้าการซื้อ</span>
+            <span id="progressText">0%</span>
+        </div>
+        <div class="progress-bar-bg">
+            <div class="progress-bar-fill" id="progressBar"></div>
+        </div>
+    </div>
+
+    <div class="input-form">
+        <div class="input-row-top">
+            <input type="text" id="itemName" class="input-name" placeholder="ชื่อสินค้า..." />
+            <select id="itemCat" class="input-cat">
+                <option value="ทั่วไป">ทั่วไป</option>
+                <option value="ของสด">ของสด</option>
+                <option value="เครื่องดื่ม">เครื่องดื่ม</option>
+                <option value="ของใช้">ของใช้</option>
+            </select>
+        </div>
+        <div class="input-row-bottom">
+            <input type="number" id="itemQty" class="input-qty" value="1" min="1" placeholder="จำนวน" />
+            <input type="number" id="itemPrice" class="input-price" placeholder="ราคา/ชิ้น" min="0" />
+            <button class="btn-add" onclick="addItem()">+ เพิ่มรายการ</button>
+        </div>
+    </div>
+
+    <div class="filter-tabs">
+        <button class="tab-btn active" onclick="setFilter('all', this)">ทั้งหมด</button>
+        <button class="tab-btn" onclick="setFilter('pending', this)">ยังไม่ซื้อ</button>
+        <button class="tab-btn" onclick="setFilter('completed', this)">ซื้อแล้ว</button>
+    </div>
+
+    <ul class="item-list" id="itemList"></ul>
+
+    <div class="summary-footer">
+        <span>ยอดรวมทั้งหมด:</span>
+        <span class="total-price" id="totalPrice">฿0</span>
+    </div>
+</div>
+
+<script>
+    let items = JSON.parse(localStorage.getItem('smart_shopping_list')) || [];
+    let currentFilter = 'all';
+
+    document.addEventListener("DOMContentLoaded", () => {
+        renderUI();
+        if (localStorage.getItem('theme') === 'dark') {
+            document.body.setAttribute('data-theme', 'dark');
+            document.getElementById('themeBtn').innerText = '☀️ Light';
+        }
+    });
+
+    function addItem() {
+        const nameInput = document.getElementById('itemName');
+        const catInput = document.getElementById('itemCat');
+        const qtyInput = document.getElementById('itemQty');
+        const priceInput = document.getElementById('itemPrice');
+
+        if (!nameInput.value.trim()) return;
+
+        const newItem = {
+            id: Date.now(),
+            name: nameInput.value.trim(),
+            category: catInput.value,
+            quantity: parseInt(qtyInput.value) || 1,
+            price: parseFloat(priceInput.value) || 0,
+            completed: false
+        };
+
+        items.push(newItem);
+        saveAndRender();
+
+        nameInput.value = '';
+        priceInput.value = '';
+        qtyInput.value = 1;
+    }
+
+    function toggleComplete(id) {
+        items = items.map(item => item.id === id ? { ...item, completed: !item.completed } : item);
+        saveAndRender();
+    }
+
+    function deleteItem(id) {
+        items = items.filter(item => item.id !== id);
+        saveAndRender();
+    }
+
+    function setFilter(filter, btn) {
+        currentFilter = filter;
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        renderUI();
+    }
+
+    function toggleTheme() {
+        const isDark = document.body.getAttribute('data-theme') === 'dark';
+        if (isDark) {
+            document.body.removeAttribute('data-theme');
+            localStorage.setItem('theme', 'light');
+            document.getElementById('themeBtn').innerText = '🌙 Dark';
+        } else {
+            document.body.setAttribute('data-theme', 'dark');
+            localStorage.setItem('theme', 'dark');
+            document.getElementById('themeBtn').innerText = '☀️ Light';
+        }
+    }
+
+    function saveAndRender() {
+        localStorage.setItem('smart_shopping_list', JSON.stringify(items));
+        renderUI();
+    }
+
+    function renderUI() {
+        const listEl = document.getElementById('itemList');
+        listEl.innerHTML = '';
+
+        const filteredItems = items.filter(item => {
+            if (currentFilter === 'pending') return !item.completed;
+            if (currentFilter === 'completed') return item.completed;
+            return true;
+        });
+
+        filteredItems.forEach(item => {
+            const li = document.createElement('li');
+            li.className = `item-card ${item.completed ? 'completed' : ''}`;
+            li.innerHTML = `
+                <div class="item-left">
+                    <input type="checkbox" class="checkbox" ${item.completed ? 'checked' : ''} onchange="toggleComplete(${item.id})">
+                    <div class="item-details">
+                        <span class="item-title">${escapeHtml(item.name)}</span>
+                        <div class="item-meta">
+                            <span class="badge">${item.category}</span>
+                            <span>x${item.quantity}</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="item-right">
+                    <span class="price-tag">฿${(item.price * item.quantity).toLocaleString()}</span>
+                    <button class="btn-del" onclick="deleteItem(${item.id})">✕</button>
+                </div>
+            `;
+            listEl.appendChild(li);
+        });
+
+        // คำนวณราคารวม
+        const total = items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+        document.getElementById('totalPrice').innerText = `฿${total.toLocaleString()}`;
+
+        // คำนวณ Progress Bar
+        const completedCount = items.filter(i => i.completed).length;
+        const progress = items.length ? Math.round((completedCount / items.length) * 100) : 0;
+        document.getElementById('progressBar').style.width = `${progress}%`;
+        document.getElementById('progressText').innerText = `${progress}%`;
+    }
+
+    function escapeHtml(text) {
+        const div = document.createElement('div');
+        div.innerText = text;
+        return div.innerHTML;
+    }
+</script>
+</body>
+</html>
